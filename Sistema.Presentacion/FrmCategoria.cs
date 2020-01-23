@@ -24,6 +24,7 @@ namespace Sistema.Presentacion
             {
                 DgvListado.DataSource = NCategoria.Listar();
                 this.Formato();
+                this.Limpiar();
                 LblTotal.Text = "Total registros: "+ Convert.ToString(DgvListado.Rows.Count);
             }
             catch (Exception ex)
@@ -56,6 +57,29 @@ namespace Sistema.Presentacion
             DgvListado.Columns[4].Width = 100;
 
         }
+
+        private void Limpiar()
+        {
+            TxtBuscar.Clear();
+            TxtNombre.Clear();
+            TxtId.Clear();
+            TxtDescripcion.Clear();
+            BtnInsertar.Visible = true;
+            ErrorIcono.Clear();
+            BtnActualizar.Visible = false;
+
+        }
+
+        private void MensajeError(string Mensaje)
+        {
+            MessageBox.Show(Mensaje, "Sistema de Ventas", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void MensajeOk(string Mensaje)
+        {
+            MessageBox.Show(Mensaje, "Sistema de Ventas", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         private void FrmCategoria_Load(object sender, EventArgs e)
         {
             this.Listar();
@@ -64,6 +88,86 @@ namespace Sistema.Presentacion
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
             this.Buscar();
+        }
+
+        private void BtnInsertar_Click(object sender, EventArgs e)
+        {
+            try 
+            {
+                string Rpta = "";
+                if (TxtNombre.Text == string.Empty)
+                {
+                    this.MensajeError("Falta Ingresar algunos datos, seran remarcados.");
+                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre");
+                }
+                else
+                {
+                    Rpta = NCategoria.Insertar(TxtNombre.Text.Trim(), TxtDescripcion.Text.Trim());
+                    if (Rpta.Equals("OK"))
+                    {
+                        this.MensajeOk("Se inserto de forma correcta el registro");
+                        this.Limpiar();
+                        this.Listar();
+                    }
+                    else
+                    {
+                        this.MensajeError(Rpta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+
+        private void BtnCancelar_Click(object sender, EventArgs e)
+        {
+            this.Limpiar();
+            TabGeneral.SelectedIndex = 0;
+        }
+
+        private void DgvListado_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            this.Limpiar();
+            BtnActualizar.Visible = true;
+            BtnInsertar.Visible = false;
+
+            TxtId.Text = Convert.ToString(DgvListado.CurrentRow.Cells["ID"].Value);
+            TxtNombre.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Nombre"].Value);
+            TxtDescripcion.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Descripcion"].Value);
+            TabGeneral.SelectedIndex = 1;
+        }
+
+        private void BtnActualizar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string Rpta = "";
+                if (TxtNombre.Text == string.Empty || TxtId.Text == string.Empty)
+                {
+                    this.MensajeError("Falta Ingresar algunos datos, seran remarcados.");
+                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre");
+                }
+                else
+                {
+                    Rpta = NCategoria.Actualizar(Convert.ToInt32(TxtId.Text), TxtNombre.Text.Trim(), TxtDescripcion.Text.Trim());
+                    if (Rpta.Equals("OK"))
+                    {
+                        this.MensajeOk("Se actualizo de forma correcta el registro");
+                        this.Limpiar();
+                        this.Listar();
+                    }
+                    else
+                    {
+                        this.MensajeError(Rpta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
         }
     }
 }
