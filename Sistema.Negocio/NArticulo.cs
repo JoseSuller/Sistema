@@ -9,48 +9,58 @@ using Sistema.Entidades;
 
 namespace Sistema.Negocio
 {
-    public class NCategoria
+    public class NArticulo
     {
         public static DataTable Listar()
         {
-            DCategoria Datos = new DCategoria();
+            DArticulo Datos = new DArticulo();
             return Datos.Listar();
         }
 
         public static DataTable Buscar(string Valor)
         {
-            DCategoria Datos = new DCategoria();
+            DArticulo Datos = new DArticulo();
             return Datos.Buscar(Valor);
         }
 
-        public static string Insertar(string Nombre, string Descripcion)
+        public static string Insertar(int IdCategoria, string Codigo, string Nombre, decimal PrecioVenta, int Stock, string Descripcion, string Imagen)
         {
-            DCategoria Datos = new DCategoria();
+            DArticulo Datos = new DArticulo();
 
             string Existe = Datos.Existe(Nombre);
             if (Existe.Equals("1"))
             {
-                return "La categoria ya existe";
+                return "El articulo ya existe";
             }
             else
             {
-                Categoria Obj = new Categoria();
+                Articulo Obj = new Articulo();
+                Obj.IdCategoria = IdCategoria;
+                Obj.Codigo = Codigo;
                 Obj.Nombre = Nombre;
+                Obj.PrecioVenta = PrecioVenta;
+                Obj.Stock = Stock;
                 Obj.Descripcion = Descripcion;
+                Obj.Imagen = Imagen;
                 return Datos.Insertar(Obj);
             }
         }
 
-        public static string Actualizar (int Id, string NombreAnt, string Nombre, string Descripcion)
+        public static string Actualizar(int Id, int IdCategoria, string Codigo, string NombreAnt, string Nombre, decimal PrecioVenta, int Stock, string Descripcion, string Imagen)
         {
-            DCategoria Datos = new DCategoria();
-            Categoria Obj = new Categoria();
+            DArticulo Datos = new DArticulo();
+            Articulo Obj = new Articulo();
 
             if (NombreAnt.Equals(Nombre))
             {
-                Obj.IdCategoria = Id;
+                Obj.IdArticulo = Id;
+                Obj.IdCategoria = IdCategoria;
+                Obj.Codigo = Codigo;
                 Obj.Nombre = Nombre;
+                Obj.PrecioVenta = PrecioVenta;
+                Obj.Stock = Stock;
                 Obj.Descripcion = Descripcion;
+                Obj.Imagen = Imagen;
                 return Datos.Actualizar(Obj);
             }
             else
@@ -58,35 +68,38 @@ namespace Sistema.Negocio
                 string Existe = Datos.Existe(Nombre);
                 if (Existe.Equals("1"))
                 {
-                    return "La categoria ya existe";
+                    return "El articulo ya existe";
                 }
                 else
                 {
-                    Obj.IdCategoria = Id;
+                    Obj.IdArticulo = Id;
+                    Obj.IdCategoria = IdCategoria;
+                    Obj.Codigo = Codigo;
                     Obj.Nombre = Nombre;
+                    Obj.PrecioVenta = PrecioVenta;
+                    Obj.Stock = Stock;
                     Obj.Descripcion = Descripcion;
+                    Obj.Imagen = Imagen;
                     return Datos.Actualizar(Obj);
                 }
             }
-
-
         }
 
         public static string Eliminar(int Id)
         {
-            DCategoria Datos = new DCategoria();            
+            DArticulo Datos = new DArticulo();
             return Datos.Eliminar(Id);
         }
 
         public static string Activar(int Id)
         {
-            DCategoria Datos = new DCategoria();
+            DArticulo Datos = new DArticulo();
             return Datos.Activar(Id);
         }
 
         public static string Desactivar(int Id)
         {
-            DCategoria Datos = new DCategoria();
+            DArticulo Datos = new DArticulo();
             return Datos.Desactivar(Id);
         }
     }
