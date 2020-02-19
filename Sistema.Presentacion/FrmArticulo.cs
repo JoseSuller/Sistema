@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Sistema.Negocio;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace Sistema.Presentacion
 {
@@ -75,10 +77,19 @@ namespace Sistema.Presentacion
             TxtBuscar.Clear();
             TxtNombre.Clear();
             TxtId.Clear();
+            TxtCodigo.Clear();
+            PanelCodigo.BackgroundImage = null;
+            BtnGuardarCodigo.Enabled = true;
+            TxtPrecioVenta.Clear();
+            TxtStock.Clear();
+            TxtImagen.Clear();
+            PicImagen.Image = null;
             TxtDescripcion.Clear();
             BtnInsertar.Visible = true;
-            ErrorIcono.Clear();
             BtnActualizar.Visible = false;
+            ErrorIcono.Clear();
+            this.RutaDestino = "";
+            this.RutaOrigen = "";
 
             DgvListado.Columns[0].Visible = false;
             BtnActivar.Visible = false;
@@ -125,12 +136,73 @@ namespace Sistema.Presentacion
         private void BtnCargarImagen_Click(object sender, EventArgs e)
         {
             OpenFileDialog file = new OpenFileDialog();
-            file.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg, *.jpeg, *.jpe, *.jfif, *.png";
+            file.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
             if(file.ShowDialog() == DialogResult.OK)
             {
                 PicImagen.Image = Image.FromFile(file.FileName);
                 TxtImagen.Text = file.FileName.Substring(file.FileName.LastIndexOf("\\")+1);
                 this.RutaOrigen = file.FileName;
+            }
+        }
+
+        private void BtnGenerar_Click(object sender, EventArgs e)
+        {
+            BarcodeLib.Barcode Codigo = new BarcodeLib.Barcode();
+            Codigo.IncludeLabel = true;
+            PanelCodigo.BackgroundImage = Codigo.Encode(BarcodeLib.TYPE.CODE128, TxtCodigo.Text, Color.Black, Color.White, 400, 100);
+            BtnGuardarCodigo.Enabled = true;
+        }
+
+        private void BtnGuardarCodigo_Click(object sender, EventArgs e)
+        {
+            Image imgFinal = (Image)PanelCodigo.BackgroundImage.Clone();
+
+            SaveFileDialog DialogoGuardar = new SaveFileDialog();
+            DialogoGuardar.AddExtension = true;
+            DialogoGuardar.Filter = "Image PNG (*.png)|*.png";
+            DialogoGuardar.ShowDialog();
+            if (!string.IsNullOrEmpty(DialogoGuardar.FileName))
+            {
+                imgFinal.Save(DialogoGuardar.FileName, ImageFormat.Png);
+            }
+            imgFinal.Dispose();
+        }
+
+        private void BtnInsertar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string Rpta = "";
+                if (CboCategoria.Text == string.Empty || TxtNombre.Text == string.Empty || TxtPrecioVenta.Text == string.Empty || TxtStock.Text == string.Empty)
+                {
+                    this.MensajeError("Falta Ingresar algunos datos, seran remarcados.");
+                    ErrorIcono.SetError(CboCategoria, "Seleccione una categoria");
+                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre");
+                    ErrorIcono.SetError(TxtPrecioVenta, "Ingrese un precio");
+                    ErrorIcono.SetError(TxtStock, "Ingrese stock inicial");
+                }
+                else
+                {
+                    Rpta = NArticulo.Insertar(Convert.ToInt32(CboCategoria.SelectedValue), TxtCodigo.Text.Trim(), TxtNombre.Text.Trim(),Convert.ToDecimal(TxtPrecioVenta.Text), Convert.ToInt32(TxtStock.Text), TxtDescripcion.Text.Trim(), TxtImagen.Text.Trim());
+                    if (Rpta.Equals("OK"))
+                    {
+                        this.MensajeOk("Se inserto de forma correcta el registro");
+                        if (TxtImagen.Text != string.Empty)
+                        {
+                            this.RutaDestino = this.Directorio + TxtImagen.Text;
+                            File.Copy(this.RutaOrigen,this.RutaDestino);
+                        }
+                        this.Listar();
+                    }
+                    else
+                    {
+                        this.MensajeError(Rpta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
             }
         }
     }
