@@ -44,6 +44,8 @@
     <Compile Include="Conexion.cs" />
     <Compile Include="DArticulo.cs" />
     <Compile Include="DCategoria.cs" />
+    <Compile Include="DRol.cs" />
+    <Compile Include="DUsuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
