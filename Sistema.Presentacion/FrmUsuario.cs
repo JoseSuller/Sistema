@@ -71,7 +71,12 @@ namespace Sistema.Presentacion
             TxtBuscar.Clear();
             TxtNombre.Clear();
             TxtId.Clear();
-            TxtDescripcion.Clear();
+            TxtNumDocumento.Clear();
+            TxtDireccion.Clear();
+            TxtTelefono.Clear();
+            TxtEmail.Clear();
+            TxtClave.Clear();
+
             BtnInsertar.Visible = true;
             ErrorIcono.Clear();
             BtnActualizar.Visible = false;
@@ -116,6 +121,62 @@ namespace Sistema.Presentacion
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
             this.Buscar();
+        }
+
+        private void BtnInsertar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string Rpta = "";
+                if (CboRol.Text == string.Empty || TxtNombre.Text == string.Empty || TxtEmail.Text == string.Empty || label9.Text == string.Empty)
+                {
+                    this.MensajeError("Falta Ingresar algunos datos, seran remarcados.");
+                    ErrorIcono.SetError(CboRol, "Ingrese un rol");
+                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre");
+                    ErrorIcono.SetError(TxtEmail, "Ingrese un email");
+                    ErrorIcono.SetError(label9, "Ingrese una clave de acceso");
+                }
+                else
+                {
+                    Rpta = NUsuario.Insertar(Convert.ToInt32(CboRol.SelectedValue), TxtNombre.Text.Trim(), CboTipoDocumento.Text, TxtNumDocumento.Text.Trim(),TxtDireccion.Text.Trim(), TxtTelefono.Text.Trim(), TxtEmail.Text.Trim(), label9.Text.Trim()) ;
+                    if (Rpta.Equals("OK"))
+                    {
+                        this.MensajeOk("Se inserto de forma correcta el registro");        
+                        this.Listar();
+                    }
+                    else
+                    {
+                        this.MensajeError(Rpta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+
+        private void DgvListado_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                this.Limpiar();
+                BtnActualizar.Visible = true;
+                BtnInsertar.Visible = false;
+                TxtId.Text = Convert.ToString(DgvListado.CurrentRow.Cells["ID"].Value);
+                CboRol.SelectedValue = Convert.ToString(DgvListado.CurrentRow.Cells["idrol"].Value);
+                TxtNombre.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Nombre"].Value);
+                CboTipoDocumento.Text= Convert.ToString(DgvListado.CurrentRow.Cells["Tipo_Documento"].Value);
+                TxtNumDocumento.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Num_Documento"].Value);
+                TxtDireccion.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Direccion"].Value);
+                TxtTelefono.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Telefono"].Value);
+                TxtEmail.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Email"].Value);
+                TabGeneral.SelectedIndex = 1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Seleccione desde la celda nombre." + "| Error: " + ex.Message);
+            }
         }
     }
 }
